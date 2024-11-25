@@ -35,7 +35,7 @@ public class ClubManagementSystem {
         if (user == null) { // 로그인 상태 확인
             loginUI();
         } else { // 로그인 되어 있음
-
+            showMainUI();
         }
 
         panel.add(topPanel, BorderLayout.NORTH);
