@@ -6,10 +6,14 @@ public class ClubManagementSystem {
     private JPanel panel;
     private JPanel topPanel;
     private JTextArea outputArea;
+    private User user = null;
+    private DBSystem controller;
 
     private int userID = 0; // 사용자 ID (로그인 여부 확인)
 
     public ClubManagementSystem() {
+
+        controller = new DBSystem();
         // UI 설정
         initialUI();
     }
@@ -28,8 +32,10 @@ public class ClubManagementSystem {
         topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout());
 
-        if (userID == 0) { // 로그인 상태 확인
+        if (user == null) { // 로그인 상태 확인
             loginUI();
+        } else { // 로그인 되어 있음
+
         }
 
         panel.add(topPanel, BorderLayout.NORTH);
@@ -59,21 +65,21 @@ public class ClubManagementSystem {
         JButton studentButton = new JButton("홍길동(학부생)으로 로그인");
         studentButton.addActionListener(e -> {
             loginFrame.dispose(); // 로그인 창 닫기
-            handleLogin("st");
+            handleLogin(10);
         });
 
         // 버튼 2: 김철수(임원)
         JButton executiveButton = new JButton("김철수(임원)으로 로그인");
         executiveButton.addActionListener(e -> {
             loginFrame.dispose(); // 로그인 창 닫기
-            handleLogin("ex");
+            handleLogin(5);
         });
 
         // 버튼 3: 김오퍼(운영진)
         JButton adminButton = new JButton("김오퍼(운영진)으로 로그인");
         adminButton.addActionListener(e -> {
             loginFrame.dispose(); // 로그인 창 닫기
-            handleLogin("ad");
+            handleLogin(1);
         });
 
         // 버튼 추가
@@ -86,34 +92,20 @@ public class ClubManagementSystem {
         loginFrame.setVisible(true);
     }
 
-    private void handleLogin(String roleValue) {
+    private void handleLogin(int num) {
         // 선택된 역할 값에 따라 처리
-        userID = 1; // 로그인 성공 상태로 변경
+        user = controller.getUserInfo(num); // 유저 정보 가져오기
         panel.removeAll(); // 기존 패널 초기화
-        showMainUI(roleValue); // 메인 UI에 역할 반영
+        showMainUI(); // 메인 UI에 역할 반영
     }
 
-    private void showMainUI(String roleValue) {
-        System.out.println(roleValue);
-        JLabel welcomeLabel = new JLabel("환영합니다! 역할: " + getRoleName(roleValue));
+    private void showMainUI() {
+        JLabel welcomeLabel = new JLabel("환영합니다! " + user.name + "님!");
         topPanel.removeAll();
         topPanel.add(welcomeLabel);
         panel.add(topPanel);
         panel.revalidate();
         panel.repaint();
-    }
-
-    private String getRoleName(String roleValue) {
-        switch (roleValue) {
-            case "st":
-                return "학부생";
-            case "ex":
-                return "임원";
-            case "ad":
-                return "운영진";
-            default:
-                return "알 수 없음";
-        }
     }
 
     public static void main(String[] args) {

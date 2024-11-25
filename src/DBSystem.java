@@ -10,7 +10,7 @@ public class DBSystem {
             ResultSet rs = stmt.executeQuery("SELECT * FROM Member WHERE id=" + num);
             System.out.println(rs.getInt(1) + " " + rs.getString(2) +
                     " " + rs.getString(3));
-            return new User(rs.getInt(1), rs.getString(2), rs.getString(3));
+            return new User(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4));
         } catch (Exception e) {
             System.out.println("LOG (E) : Failed to Look Up Member Information");
             return null;
@@ -29,18 +29,9 @@ public class DBSystem {
 
     }
 
+    // 소멸자
     @Override
     protected void finalize() throws Throwable {
         con.close();
-    }
-
-    public static void main(String args[]) {
-        try {
-            while (rs.next())
-                
-            
-        } catch (Exception e) {
-            System.out.println(e);
-        }
     }
 }
