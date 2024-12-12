@@ -8,6 +8,35 @@ import java.util.List;
 public class DBSystem {
     private Connection con;
 
+    public List<Account> getAccountList(int clubId) {
+        List<Account> accountList = new ArrayList<>();
+        String query = "SELECT * FROM financial_records WHERE club_id = ? ORDER BY usage_date DESC";
+
+        try (PreparedStatement stmt = con.prepareStatement(query)) {
+            stmt.setInt(1, clubId); // Set club_id in the query
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // Retrieve values from the ResultSet
+                int recordId = rs.getInt("record_id");
+                String usageDescription = rs.getString("usage_description");
+                int amount = rs.getInt("amount");
+                String usageDate = rs.getString("usage_date");
+                int clubIdFromDB = rs.getInt("club_id");
+
+                // Create a new Account object and add it to the list
+                Account account = new Account(recordId, usageDescription, amount, usageDate, clubIdFromDB);
+                accountList.add(account);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return accountList;
+    }
+
     public void makeAccount(String usageDescription, int amount, String usageDate, int clubId) {
         // SQL 쿼리문 준비
         String sql = "INSERT INTO financial_records (usage_description, amount, usage_date, club_id) "

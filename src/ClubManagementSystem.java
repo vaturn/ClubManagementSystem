@@ -161,13 +161,41 @@ public class ClubManagementSystem {
             JButton makeAccountButton = new JButton("장부 작성");
             makeAccountButton.addActionListener(e -> openAccountForm());
             topPanel.add(makeAccountButton);
+
         }
+
+        // Add "모집 공고" button to view accounts
+        JButton viewAccountButton = new JButton("모집 공고");
+        viewAccountButton.addActionListener(e -> showAccountList());
+        topPanel.add(viewAccountButton);
 
         panel.add(topPanel);
         panel.revalidate();
         panel.repaint();
 
         showClubList();
+    }
+
+    private void showAccountList() {
+        // Get the list of accounts for the current club
+        List<Account> accountList = controller.getAccountList(user.club_id);
+
+        // Create a new panel to display the accounts
+        JPanel accountListPanel = new JPanel();
+        accountListPanel.setLayout(new BoxLayout(accountListPanel, BoxLayout.Y_AXIS)); // Stack accounts vertically
+
+        // Add each account to the panel
+        for (Account account : accountList) {
+            JLabel accountLabel = new JLabel("사용내역: " + account.usageDescription +
+                    ", 금액: " + account.amount + ", 사용날짜: " + account.usageDate);
+            accountListPanel.add(accountLabel);
+        }
+
+        // Display the account list panel on the main panel
+        JScrollPane scrollPane = new JScrollPane(accountListPanel);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.revalidate();
+        panel.repaint();
     }
 
     private void openAccountForm() {
