@@ -4,6 +4,20 @@ import java.sql.*;
 public class DBSystem {
     private Connection con;
 
+    public User registerUser(int num, String name, String role, String join_date) {
+        try {
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate(
+                    "INSERT INTO users (user_id, name, role, join_date) VALUES (" + num + " ,\'" + name + "\', \'"
+                            + role + "\', \'" + join_date + "\')");
+
+            return getUserInfo(num);
+        } catch (Exception e) {
+            System.out.println("LOG (E) : Failed to Register New Member");
+            return null;
+        }
+    }
+
     public Club getClubInfo(int id) {
         try {
             Statement stmt = con.createStatement();
