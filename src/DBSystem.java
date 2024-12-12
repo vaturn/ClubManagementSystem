@@ -12,7 +12,7 @@ public class DBSystem {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(
                     "SELECT c.club_name, c.club_id, u.name, c.description, c.est_date " +
-                            "FROM clubs c JOIN users u ON c.president_id = u.user_id");
+                            "FROM clubs c LEFT JOIN users u ON c.president_id = u.user_id");
 
             List<Club> clubs = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.time.LocalDateTime;
 
 public class ClubManagementSystem {
@@ -144,6 +145,33 @@ public class ClubManagementSystem {
         registerFrame.setVisible(true);
     }
 
+    private void showClubList() {
+        // Get the list of clubs
+        List<Club> clubList = controller.getClubList();
+
+        // Create a new panel to display the clubs
+        JPanel clubListPanel = new JPanel();
+        clubListPanel.setLayout(new BoxLayout(clubListPanel, BoxLayout.Y_AXIS));
+
+        System.out.println("LOG (E)");
+        // Add each club to the panel
+        for (Club club : clubList) {
+            System.out.println(club.name);
+            JLabel clubLabel = new JLabel("동아리 이름: " + club.name + ", 회장: " + club.presidentName);
+            clubListPanel.add(clubLabel);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(clubListPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        panel.removeAll();
+        panel.add(topPanel, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        panel.revalidate();
+        panel.repaint();
+    }
+
     private void handleLogin(int num) {
         // 선택된 역할 값에 따라 처리
         user = controller.getUserInfo(num); // 유저 정보 가져오기
@@ -155,9 +183,18 @@ public class ClubManagementSystem {
         JLabel welcomeLabel = new JLabel("환영합니다! " + user.name + "님!");
         topPanel.removeAll();
         topPanel.add(welcomeLabel);
+
+        // Add club info if user is associated with a club
+        if (user.club != null && !user.club.isEmpty()) {
+            JLabel clubLabel = new JLabel("소속 동아리: " + user.club);
+            topPanel.add(clubLabel);
+        }
+
         panel.add(topPanel);
         panel.revalidate();
         panel.repaint();
+
+        showClubList();
     }
 
     public static void main(String[] args) {
