@@ -1,10 +1,41 @@
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBSystem {
     private Connection con;
+
+    public void makeAccount(String usageDescription, int amount, String usageDate, int clubId) {
+        // SQL 쿼리문 준비
+        String sql = "INSERT INTO financial_records (usage_description, amount, usage_date, club_id) "
+                + "VALUES (?, ?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = con.prepareStatement(sql)) {
+            // 사용내역, 금액, 사용날짜, 동아리 ID를 파라미터로 설정
+            preparedStatement.setString(1, usageDescription);
+            preparedStatement.setInt(2, amount);
+
+            // String으로 들어온 사용날짜를 LocalDate로 변환
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate date = LocalDate.parse(usageDate, formatter);
+            preparedStatement.setDate(3, java.sql.Date.valueOf(date));
+
+            preparedStatement.setInt(4, clubId); // 동아리 ID
+
+            // 쿼리 실행
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("장부 작성이 완료되었습니다.");
+            } else {
+                System.out.println("장부 작성에 실패했습니다.");
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL 오류 발생: " + e.getMessage());
+        }
+    }
 
     public List<Club> getClubList() {
 
@@ -69,11 +100,11 @@ public class DBSystem {
         try {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(
-                    "SELECT u.name, u.role, c.club_name, m.role FROM users u LEFT JOIN memberships m ON u.user_id = m.user_id LEFT JOIN clubs c ON m.club_id = c.club_id WHERE u.user_id = "
+                    "SELECT u.name, u.role, c.club_name, m.role, c.club_id FROM users u LEFT JOIN memberships m ON u.user_id = m.user_id LEFT JOIN clubs c ON m.club_id = c.club_id WHERE u.user_id = "
                             + num);
             rs.next();
 
-            return new User(num, rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4));
+            return new User(num, rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getInt(5));
 
         } catch (Exception e) {
             System.out.println(e);

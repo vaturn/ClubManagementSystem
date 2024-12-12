@@ -10,13 +10,13 @@ public class ClubManagementSystem {
     private JTextArea outputArea;
 
     private User user = null;
+    private Club club = null;
 
     private DBSystem controller;
 
     private Club[] clubs;
 
     public ClubManagementSystem() {
-
         controller = new DBSystem();
         // UI 설정
         initialUI();
@@ -34,7 +34,7 @@ public class ClubManagementSystem {
 
         // 상단 panel 설정
         topPanel = new JPanel();
-        topPanel.setLayout(new FlowLayout());
+        topPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         if (user == null) { // 로그인 상태 확인
             loginUI();
@@ -145,40 +145,6 @@ public class ClubManagementSystem {
         registerFrame.setVisible(true);
     }
 
-    private void showClubList() {
-        // Get the list of clubs
-        List<Club> clubList = controller.getClubList();
-
-        // Create a new panel to display the clubs
-        JPanel clubListPanel = new JPanel();
-        clubListPanel.setLayout(new BoxLayout(clubListPanel, BoxLayout.Y_AXIS));
-
-        System.out.println("LOG (E)");
-        // Add each club to the panel
-        for (Club club : clubList) {
-            System.out.println(club.name);
-            JLabel clubLabel = new JLabel("동아리 이름: " + club.name + ", 회장: " + club.presidentName);
-            clubListPanel.add(clubLabel);
-        }
-
-        JScrollPane scrollPane = new JScrollPane(clubListPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-        panel.removeAll();
-        panel.add(topPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
-
-        panel.revalidate();
-        panel.repaint();
-    }
-
-    private void handleLogin(int num) {
-        // 선택된 역할 값에 따라 처리
-        user = controller.getUserInfo(num); // 유저 정보 가져오기
-        panel.removeAll(); // 기존 패널 초기화
-        showMainUI(); // 메인 UI에 역할 반영
-    }
-
     private void showMainUI() {
         JLabel welcomeLabel = new JLabel("환영합니다! " + user.name + "님!");
         topPanel.removeAll();
@@ -190,11 +156,89 @@ public class ClubManagementSystem {
             topPanel.add(clubLabel);
         }
 
+        // Add "장부 작성" button if the user is an "임원"
+        if ("임원".equals(user.role)) {
+            JButton makeAccountButton = new JButton("장부 작성");
+            makeAccountButton.addActionListener(e -> openAccountForm());
+            topPanel.add(makeAccountButton);
+        }
+
         panel.add(topPanel);
         panel.revalidate();
         panel.repaint();
 
         showClubList();
+    }
+
+    private void openAccountForm() {
+        // Create the account form frame
+        JFrame accountFrame = new JFrame("장부 작성");
+        accountFrame.setSize(300, 200);
+        accountFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        // Panel for the form
+        JPanel accountPanel = new JPanel();
+        accountPanel.setLayout(new GridLayout(4, 2, 10, 10));
+
+        // Add fields for usage details, amount, and date
+        JLabel usageLabel = new JLabel("사용내역:");
+        JTextField usageField = new JTextField();
+        JLabel amountLabel = new JLabel("금액:");
+        JTextField amountField = new JTextField();
+        JLabel dateLabel = new JLabel("사용날짜:");
+        JTextField dateField = new JTextField();
+
+        // Button to submit the account
+        JButton submitButton = new JButton("완료");
+        submitButton.addActionListener(e -> {
+            String usage = usageField.getText();
+            int amount = Integer.parseInt(amountField.getText());
+            String date = dateField.getText();
+            controller.makeAccount(usage, amount, date, user.club_id); // Call the controller method
+            accountFrame.dispose(); // Close the form
+        });
+
+        // Add components to the form panel
+        accountPanel.add(usageLabel);
+        accountPanel.add(usageField);
+        accountPanel.add(amountLabel);
+        accountPanel.add(amountField);
+        accountPanel.add(dateLabel);
+        accountPanel.add(dateField);
+        accountPanel.add(submitButton);
+
+        // Add the form panel to the frame
+        accountFrame.add(accountPanel);
+        accountFrame.setVisible(true);
+    }
+
+    private void showClubList() {
+        // Get the list of clubs
+        List<Club> clubList = controller.getClubList();
+
+        // Create a new panel to display the clubs
+        JPanel clubListPanel = new JPanel();
+        clubListPanel.setLayout(new BoxLayout(clubListPanel, BoxLayout.Y_AXIS)); // Stack clubs vertically
+
+        // Add each club to the panel
+        for (Club club : clubList) {
+            JLabel clubLabel = new JLabel("동아리 이름: " + club.name + ", 회장: " + club.presidentName);
+            clubListPanel.add(clubLabel);
+        }
+
+        // Display the club list panel on the main panel
+        JScrollPane scrollPane = new JScrollPane(clubListPanel);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.revalidate();
+        panel.repaint();
+    }
+
+    private void handleLogin(int num) {
+        // 선택된 역할 값에 따라 처리
+        user = controller.getUserInfo(num); // 유저 정보 가져오기
+
+        panel.removeAll(); // 기존 패널 초기화
+        showMainUI(); // 메인 UI에 역할 반영
     }
 
     public static void main(String[] args) {
