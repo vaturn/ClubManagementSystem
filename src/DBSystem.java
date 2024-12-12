@@ -4,12 +4,27 @@ import java.sql.*;
 public class DBSystem {
     private Connection con;
 
+    public Club getClubInfo(int id) {
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT c.club_name, c.club_id, u.name, c.description, c.establishment_date FROM clubs c JOIN users u ON c.president_id = u.user_id WHERE c.club_id = "
+                            + id + ";");
+            System.out.println(rs.getInt(1) + " " + rs.getString(2) +
+                    " " + rs.getString(3));
+            return new Club(rs.getString(1), rs.getInt(2), rs.getString(3), rs.getString(4), rs.getString(5));
+        } catch (Exception e) {
+            System.out.println("LOG (E) : Failed to Look Up Member Information");
+            return null;
+        }
+    }
+
     public User getUserInfo(int num) {
         try {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(
                     "SELECT u.name, u.role, c.club_name , m.role FROM users u JOIN memberships m ON u.user_id = m.user_id JOIN clubs c ON m.club_id = c.club_id WHERE u.user_id = "
-                            + num);
+                            + num + ";");
             System.out.println(rs.getInt(1) + " " + rs.getString(2) +
                     " " + rs.getString(3));
             return new User(num, rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4));
