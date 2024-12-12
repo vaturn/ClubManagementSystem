@@ -6,10 +6,12 @@ public class ClubManagementSystem {
     private JPanel panel;
     private JPanel topPanel;
     private JTextArea outputArea;
+
     private User user = null;
+
     private DBSystem controller;
 
-    private int userID = 0; // 사용자 ID (로그인 여부 확인)
+    private Club[] clubs;
 
     public ClubManagementSystem() {
 
