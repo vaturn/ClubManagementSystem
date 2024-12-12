@@ -1,8 +1,39 @@
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBSystem {
     private Connection con;
+
+    public List<Club> getClubList() {
+
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(
+                    "SELECT c.club_name, c.club_id, u.name, c.description, c.est_date " +
+                            "FROM clubs c JOIN users u ON c.president_id = u.user_id;");
+
+            List<Club> clubs = new ArrayList<>();
+
+            while (rs.next()) {
+                String name = rs.getString("club_name");
+                int id = rs.getInt("club_id");
+                String presidentName = rs.getString("name");
+                String description = rs.getString("description");
+                String openingDate = rs.getString("est_date");
+
+                // Club 객체 생성 후 리스트에 추가
+                Club club = new Club(name, id, presidentName, description, openingDate);
+                clubs.add(club);
+            }
+
+            return clubs;
+        } catch (Exception e) {
+            System.out.println("LOG (E) : Failed to Register New Member");
+            return null;
+        }
+    }
 
     public User registerUser(int num, String name, String role, String join_date) {
         try {
@@ -22,7 +53,7 @@ public class DBSystem {
         try {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery(
-                    "SELECT c.club_name, c.club_id, u.name, c.description, c.establishment_date FROM clubs c JOIN users u ON c.president_id = u.user_id WHERE c.club_id = "
+                    "SELECT c.club_name, c.club_id, u.name, c.description, c.est_date FROM clubs c JOIN users u ON c.president_id = u.user_id WHERE c.club_id = "
                             + id + ";");
             System.out.println(rs.getInt(1) + " " + rs.getString(2) +
                     " " + rs.getString(3));
